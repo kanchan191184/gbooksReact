@@ -1,0 +1,7 @@
+@use "./scss/partials/colors" as *;
+@use "./scss/partials/typography" as *;
+
+body {
+  background-color: $background-color;
+  font-family: $font-family;
+}
