@@ -1,2 +1,2 @@
-export const API_KEY = "AIzaSyBibOr_ZpvAPwuamFKzzQ0Qely_pbSm_40";
-export const API_URL = `https://www.googleapis.com/books/v1/volumes?q=`;
+export const API_KEY = process.env.REACT_APP_API_KEY; // API key for Google Books API
+export const API_URL = process.env.REACT_APP_API_URL; // Base URL for Google Books API
