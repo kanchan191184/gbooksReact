@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getRandomBook } from "../../services/user-services";
+import { processBookData } from "../../utils/processBookData";
 import BookCard from "../../components/BookCard/BookCard";
 import classes from "./BookLoader.module.scss";
 import Modal from "../../components/Modal/Modal";
@@ -17,15 +18,7 @@ export default function UserLoader({ bookTitle }) {
     getRandomBook(bookTitle)
       .then((data) => {
         if (data && data.length > 0) {
-          const processedData = data.map((book) => ({
-            title: book?.volumeInfo?.title || "Unknown Title",
-            author1: book?.volumeInfo?.authors?.[0] || "Unknown Author",
-            author2: book?.volumeInfo?.authors?.[1] || null,
-            image: book?.volumeInfo?.imageLinks?.thumbnail || null,
-            description:
-              book?.volumeInfo?.description || "No description available",
-          }));
-          setbookData(processedData);
+          setbookData(processBookData(data));
           setFetchStatus("SUCCESS");
         } else {
           throw new Error("No book data available");
