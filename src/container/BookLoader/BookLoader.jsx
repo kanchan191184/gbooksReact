@@ -4,6 +4,7 @@ import { processBookData } from "../../utils/processBookData";
 import BookCard from "../../components/BookCard/BookCard";
 import classes from "./BookLoader.module.scss";
 import Modal from "../../components/Modal/Modal";
+import ReactPaginate from "react-paginate";
 
 export default function UserLoader({ bookTitle }) {
   const [bookData, setbookData] = useState([]);
@@ -11,14 +12,21 @@ export default function UserLoader({ bookTitle }) {
   const [fetchStatus, setFetchStatus] = useState("PENDING");
   const [selectedBook, setSelectedBook] = useState(null); // State for the selected book
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [pageCount, setPageCount] = useState(0); // Total number of pages
+  const [currentPage, setCurrentPage] = useState(0); // Current page (0-indexed)
+  const postsPerPage = 10; // Number of posts per page
 
   useEffect(() => {
     if (!bookTitle) return;
     setFetchStatus("LOADING");
-    getRandomBook(bookTitle)
+    getRandomBook(bookTitle, currentPage, postsPerPage)
       .then((data) => {
-        if (data && data.length > 0) {
-          setbookData(processBookData(data));
+        console.log("Fetched Data Items:", data.items);
+        if (data && data.items.length > 0) {
+          const processedData = processBookData(data.items);
+          console.log("Processed Data:", processedData);
+          setbookData(processedData);
+          setPageCount(Math.ceil(data.totalItems / postsPerPage)); // Calculate total pages
           setFetchStatus("SUCCESS");
         } else {
           throw new Error("No book data available");
@@ -28,7 +36,7 @@ export default function UserLoader({ bookTitle }) {
         setFetchStatus("FAILED");
         setError(e);
       });
-  }, [bookTitle]);
+  }, [bookTitle, currentPage]);
 
   // const title = bookData[0].volumeInfo.title;
   // const author1 = bookData[0].volumeInfo.authors[0]; // author of the book
@@ -40,6 +48,10 @@ export default function UserLoader({ bookTitle }) {
   const handleCardClick = (book) => {
     setSelectedBook(book); // Set the selected book
     setIsModalOpen(true); // Open the modal
+  };
+
+  const handlePageClick = (data) => {
+    setCurrentPage(data.selected); // Update the current page
   };
 
   const closeModal = () => {
@@ -73,6 +85,20 @@ export default function UserLoader({ bookTitle }) {
           </div>
         </div>
       )}
+
+      <ReactPaginate
+        previousLabel={"Previous"}
+        nextLabel={"Next"}
+        breakLabel={"..."}
+        breakClassName={"break-me"}
+        pageCount={pageCount} // Total number of pages
+        marginPagesDisplayed={2} // How many pages to show at the beginning and end
+        pageRangeDisplayed={3} // How many pages to show around the current page
+        onPageChange={handlePageClick} // What happens when a page is clicked
+        containerClassName={classes.pagination} // CSS class for the pagination container
+        activeClassName={classes.active} // CSS class for the active page
+      />
+
       {isModalOpen && selectedBook && (
         <Modal onClose={closeModal}>
           <h2>{selectedBook.title}</h2>
