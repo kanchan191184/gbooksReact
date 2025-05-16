@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getRandomBook } from "../../services/user-services";
+import { getRandomBook } from "../../services/book-services";
 import { processBookData } from "../../utils/processBookData";
 import BookCard from "../../components/BookCard/BookCard";
 import classes from "./BookLoader.module.scss";
@@ -26,7 +26,9 @@ export default function UserLoader({ bookTitle }) {
           const processedData = processBookData(data.items);
           console.log("Processed Data:", processedData);
           setbookData(processedData);
-          setPageCount(Math.ceil(data.totalItems / postsPerPage)); // Calculate total pages
+
+          const totalAvailable = data.totalItems > 100 ? 100 : data.totalItems;
+          setPageCount(Math.ceil(totalAvailable / postsPerPage)); // Calculate total pages
           setFetchStatus("SUCCESS");
         } else {
           throw new Error("No book data available");
